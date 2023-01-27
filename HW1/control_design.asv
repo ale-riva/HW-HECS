@@ -48,7 +48,8 @@ omega0 = 0.2;
 [K_pid,Ti,Td,N]=polePlacePID(chi,omega0,zeta,Tau,gamma_tank,k_tank);
 F = tf([K_pid*(Ti+Td*Ti*N), K_pid*(Ti*N +1),K_pid*N],[Ti, Ti*N 0]);
 F_best = F;
-sim("tanks.mdl")
+out_cont = sim("tanks.mdl")
+tank2_out = out_cont.tank2_out;
 S3 = stepinfo(tank2_out.signals.values,tank2_out.time,50,40)
 
 
@@ -146,16 +147,29 @@ rank(Wo)
 
 %Continuous poles to discrete poles
 G_cl = feedback(F_best*G,1,-1);
-poles_cl_cont = pole(G_cl)
+G_cl = zpk(G_cl)
+poles_cl_cont = pole(minreal(G_cl))
 poles_c1_dis = exp(poles_cl_cont*Ts)
 
 % State feedback controller gain
-L = acker();
+L = acker(Phi, Gamma,[poles_c1_dis(1),poles_c1_dis(2)])
 % observer gain
-K = 1;
+K = (acker(Phi',C',[poles_c1_dis(3),poles_c1_dis(4)]))'
 % reference gain
-lr = 1;
+lr = 4;
 
 % augmented system matrices
-Aa = 1;
-Ba = 1;
+Aa = [Phi -Gamma*L;K*C Phi-Gamma*L-K*C];
+AA = [Phi-Gamma*L Gamma*L; zeros(2) Phi-K*C]
+eig_Aa = eig(AA)
+poles_c1_dis
+Ba = [Gamma*lr;Gamma*lr];
+out = sim("tanks_dis_designed.slx")
+tanksDis_designed_out = out.tanks_dis_designed_out;
+plot(tanksDis_dis_out.time,tanksDis_dis_out.signals.values)
+hold on
+plot(tanksDis_designed_out.time,tanksDis_designed_out.signals.values)
+title("Discretized vs Discrete design [Ts="+Ts+"]")
+legend("discrete","continuous")
+grid on
+
