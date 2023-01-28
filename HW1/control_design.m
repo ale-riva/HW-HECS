@@ -1,4 +1,4 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Hybrid and Embedded control systems
 % Homework 1
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -152,9 +152,9 @@ poles_cl_cont = pole(minreal(G_cl))
 poles_c1_dis = exp(poles_cl_cont*Ts)
 
 % State feedback controller gain
-L = acker(Phi, Gamma,[poles_c1_dis(1),poles_c1_dis(2)])
+L = acker(Phi, Gamma,[poles_c1_dis(3),poles_c1_dis(4)])
 % observer gain
-K = (acker(Phi',C',[poles_c1_dis(3),poles_c1_dis(4)]))'
+K = (acker(Phi',C',[poles_c1_dis(1),poles_c1_dis(2)]))'
 % reference gain
 lr = 1/(C*(eye(2)-Phi+Gamma*L)^-1*Gamma);
 
